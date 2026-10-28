@@ -2584,5 +2584,18 @@ body {
 
 .tiktok-feed-item {
   scroll-snap-align: start;
-  scroll-snap-stop: always;
+}
+
+/* 📌 เว้นพื้นที่ล่างสุดของแชตเดี่ยว ให้ Home Bar จิ้มติด */
+#chatDetailScreen .chat-body {
+  padding-bottom: 50px !important;
+}
+
+#chatDetailScreen {
+  position: relative !important;
+  height: 100% !important;
+}
+
+#chatDetailScreen .chat-input-bar {
+  margin-bottom: 20px !important;
 }

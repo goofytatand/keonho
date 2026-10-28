@@ -221,8 +221,7 @@
     <!-- 5. Single Chat Room Screen -->
     <div id="chatDetailScreen" class="screen app-screen" style="display: none; z-index: 60;">
       <div class="chat-header">
-        <button class="back-btn" onclick="closeChatDetail()">❮ Back</button>
-        <div class="chat-contact">
+        <button class="back-btn" onclick="event.stopPropagation(); closeChatDetail();">Back</button>        <div class="chat-contact">
           <img id="detailAvatar" class="contact-avatar-img" src="assets/locket.JPEG" alt="Avatar">
           <span id="detailName" class="contact-name">my eomeom</span>
         </div>
@@ -237,10 +236,10 @@
         <button class="send-btn" onclick="sendMessage()">↑</button>
       </div>
 
-      <div class="home-bar-container" onclick="closeChatDetail()">
-        <div class="home-bar-dark"></div>
-      </div>
-    </div>
+    <div class="home-bar-container" onclick="goHomeFromChat(event)" style="cursor: pointer; position: relative; z-index: 9999;">
+  <div class="home-bar-dark"></div>
+</div>
+</div>
 
     <!-- 6. Apple Music Screen -->
     <div id="musicScreen" class="screen app-screen music-screen" style="display: none; z-index: 55;">
@@ -1886,9 +1885,9 @@
       <div style="position: absolute; top: 44px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 250; height: 44px; box-sizing: border-box;">
         
         <!-- ปุ่มย้อนกลับ -->
-        <div onclick="closeTikTokVideoPlayer()" style="cursor: pointer; color: #fff; font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
-          ❮
-        </div>
+       <div onclick="event.stopPropagation(); closeTikTokVideoPlayer();" style="cursor: pointer; color: #fff; font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+        ❮
+      </div>
 
         <!-- ชื่อเพลงตรงกลาง -->
         <div style="background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
@@ -2098,20 +2097,19 @@
   <div class="tiktok-feed-item" style="position: relative; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; flex-shrink: 0; box-sizing: border-box; overflow: hidden;">
     
     <div style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 1; background: #000;">
-      <video id="tiktokDraftVideo3" src="assets/eomtiktok.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
+      <video id="tiktokDraftVideo3" src="assets/eomgrid3.mp4" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
     </div>
     
     <audio id="tiktokAudioPlayer3" src="assets/tiktoksound3.mp3" loop></audio>
 
     <!-- Header ด้านบน -->
-    <div style="position: absolute; top: 44px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 50;">
-      <div onclick="closeTikTokVideoPlayer3()" style="cursor: pointer; color: #fff; font-size: 26px; font-weight: 300; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">❮</div>
-      <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 6px 14px; display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.8); font-size: 13px;">
-        <span>🔍</span><span>Find related content</span>
-      </div>
-      <div style="color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;">Search</div>
-    </div>
-
+<div style="position: absolute; top: 44px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 50;">
+  <div onclick="event.stopPropagation(); closeTiktokPostedVideo(event);" style="cursor: pointer; color: #fff; font-size: 26px; font-weight: 300; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">❮</div>
+  <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 6px 14px; display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.8); font-size: 13px;">
+    <span>🔍</span><span>Find related content</span>
+  </div>
+  <div style="color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;">Search</div>
+</div>
     <!-- แถบไอคอนขวามือ (วิดีโอออม) -->
     <div style="position: absolute; right: 12px; bottom: 115px; display: flex; flex-direction: column; align-items: center; gap: 14px; z-index: 50;">
       <div style="position: relative; width: 44px; height: 44px; margin-bottom: 2px;">

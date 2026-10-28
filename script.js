@@ -233,7 +233,7 @@ const chatData = {
       { sender: "sent", text: "เหมือนหล่อ" },
       { sender: "received", image: "assets/jojo.jpg" },
       { sender: "received", text: "ก็พอตัว" },
-      
+
     ]
   },
   james: {
@@ -268,6 +268,7 @@ function openChatDetail(chatKey) {
   const avatarEl = document.getElementById("detailAvatar");
   const chatBody = document.getElementById("chatBody");
   const detailScreen = document.getElementById("chatDetailScreen");
+  const messagesScreen = document.getElementById("messagesScreen"); // ดึงหน้า List รวมมาด้วย
 
   if (nameEl) nameEl.innerText = currentChat.name;
   if (avatarEl) avatarEl.src = currentChat.avatar;
@@ -291,42 +292,27 @@ function openChatDetail(chatKey) {
     chatBody.scrollTop = chatBody.scrollHeight;
   }
 
+  // ซ่อนหน้า List แล้วเปิดหน้า Detail แชตเดี่ยว
+  if (messagesScreen) {
+    messagesScreen.style.display = "none";
+  }
   if (detailScreen) {
     detailScreen.style.display = "flex";
   }
 }
 
-function closeChatDetail() {
+function closeChatDetail(e) {
+  if (e) e.stopPropagation(); // หยุดการส่งผ่านคลิกไม่ให้หลุดไปโดนปุ่มปิดแอป
+
   const detailScreen = document.getElementById("chatDetailScreen");
+  const messagesScreen = document.getElementById("messagesScreen");
+
+  // ปิดหน้า Detail แชตเดี่ยว แล้วโชว์หน้า List รวมแชตกลับมา
   if (detailScreen) {
     detailScreen.style.display = "none";
   }
-}
-
-function sendMessage() {
-  const input = document.getElementById("chatInput");
-  const chatBody = document.getElementById("chatBody");
-  if (!input || !chatBody) return;
-
-  const text = input.value.trim();
-  if (text !== "") {
-    const bubble = document.createElement("div");
-    bubble.className = "bubble bubble-sent";
-    bubble.innerText = text;
-    chatBody.appendChild(bubble);
-
-    if (chatData[activeChatKey]) {
-      chatData[activeChatKey].messages.push({ sender: "sent", text: text });
-    }
-
-    input.value = "";
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }
-}
-
-function handleChatSend(event) {
-  if (event.key === "Enter") {
-    sendMessage();
+  if (messagesScreen) {
+    messagesScreen.style.display = "flex";
   }
 }
 
@@ -355,7 +341,7 @@ function openPhotoDetailByIndex(index) {
 function closePhotoDetail() {
   const photoDetailScreen = document.getElementById('photoDetailScreen');
   const photosScreen = document.getElementById('photosScreen');
-  
+
   if (photoDetailScreen) photoDetailScreen.style.display = 'none';
   if (photosScreen) photosScreen.style.display = 'block'; // หรือ flex ตามสไตล์มึง
 }
@@ -521,7 +507,7 @@ function closeNoteDetail() {
   if (detailScreen) {
     detailScreen.style.setProperty('display', 'none', 'important');
   }
-  
+
   // 2. เปิดหน้าลิสต์รายการ Notes กลับมา
   const notesScreen = document.getElementById("notesScreen");
   if (notesScreen) {
@@ -621,7 +607,7 @@ function openIgChat() {
 function closeIgApp() {
   // ซ่อนหน้าจอแอปและโฟลเดอร์ทั้งหมดในระบบ
   const allScreens = document.querySelectorAll('.app-screen, .screen, .folder-modal, #folderModal, #cameraScreen, #photoDetailScreen, #chatDetailScreen, #igScreen, #igFeedScreen, #igDmListScreen, #igChatScreen, #igPostModal, #musicScreen, #notesScreen, #noteDetailScreen, #photosScreen, #messagesScreen, #phoneScreen');
-  
+
   allScreens.forEach(screen => {
     if (screen) {
       screen.style.setProperty('display', 'none', 'important');
@@ -630,7 +616,7 @@ function closeIgApp() {
 
   // หยุดวิดีโอกล้องหรือเสียงเพลงถ้าเปิดค้างอยู่
   const camVideo = document.getElementById('fakeCameraVideo');
-  if (camVideo) { try { camVideo.pause(); } catch(e) {} }
+  if (camVideo) { try { camVideo.pause(); } catch (e) { } }
 
   // แสดงหน้า Home Screen หลักขึ้นมา
   const homeScreen = document.getElementById("homeScreen");
@@ -640,7 +626,7 @@ function closeIgApp() {
 }
 
 // ผูกอีเวนต์คลิกกับขีดล่าง Global แบบบังคับรับแรงคลิก 100%
-document.addEventListener("click", function(e) {
+document.addEventListener("click", function (e) {
   const globalBar = document.getElementById("globalHomeBar");
   if (globalBar && (e.target === globalBar || globalBar.contains(e.target))) {
     e.stopPropagation();
@@ -665,14 +651,14 @@ function openPostModal(imgSrc, username, likes, caption) {
   if (modal) {
     // 1. ig post
     if (postImg) postImg.src = imgSrc;
-    
+
     // 2. username
     if (userEl) userEl.innerText = username;
     if (captionUserEl) captionUserEl.innerText = username;
-    
+
     // 3. cap
     if (captionEl) captionEl.innerText = caption || '';
-    
+
     // 4. likes
     currentLikes = parseInt(likes, 10) || 0;
     if (likesEl) likesEl.innerText = currentLikes.toLocaleString();
@@ -692,7 +678,7 @@ function closePostModal() {
 function toggleModalLike() {
   const likeBtn = document.getElementById('modalLikeBtn');
   const likesEl = document.getElementById('modalLikesCount');
-  
+
   if (!isLiked) {
     isLiked = true;
     currentLikes += 1;
@@ -711,7 +697,7 @@ function toggleModalLike() {
 function openFolder() {
   const folderModal = document.getElementById("folderModal");
   if (folderModal) folderModal.style.display = 'flex';
-  
+
   // ซ่อนแถบขีดล่างชั่วคราวตอนเปิดโฟลเดอร์ เพื่อไม่ให้มาบล็อกการคลิก
   const globalBar = document.getElementById("globalHomeBar");
   if (globalBar) globalBar.style.display = 'none';
@@ -720,7 +706,7 @@ function openFolder() {
 function closeFolder() {
   const folderModal = document.getElementById("folderModal");
   if (folderModal) folderModal.style.display = 'none';
-  
+
   // คืนค่าแถบขีดล่างกลับมา
   const globalBar = document.getElementById("globalHomeBar");
   if (globalBar) globalBar.style.display = 'flex';
@@ -748,7 +734,7 @@ function closeApp(screenId) {
   // เคลียร์พิเศษเฉพาะบางแอป (เช่น หยุดวิดีโอกล้อง หรือเคลียร์สายโทรศัพท์)
   if (screenId === 'cameraScreen') {
     const camVideo = document.getElementById('fakeCameraVideo');
-    if (camVideo) { try { camVideo.pause(); } catch(e) {} }
+    if (camVideo) { try { camVideo.pause(); } catch (e) { } }
   }
   if (screenId === 'phoneScreen' && typeof endCall === 'function') {
     endCall();
@@ -795,7 +781,7 @@ function closeIgDmList() {
 function openIgChat(chatKey) {
   const cleanKey = chatKey ? String(chatKey).trim().toLowerCase() : "eomeomsh";
   const chatData = igChatDatabase[cleanKey] || igChatDatabase["eomeomsh"];
-  
+
   const listScreen = document.getElementById("igDmListScreen");
   const chatScreen = document.getElementById("igChatScreen");
 
@@ -813,7 +799,7 @@ function openIgChat(chatKey) {
   if (chatMessagesContainer) {
     let htmlContent = `<div class="ig-chat-time">Today 2:04 AM</div>`;
 
-   chatData.messages.forEach(msg => {
+    chatData.messages.forEach(msg => {
       if (msg.image) {
         // ถ้าเป็นรูปภาพ ให้แสดงภาพแบบอิสระ ไม่มีกรอบบับเบิลสีฟ้าครอบ
         let imageBubbleContent = `<img src="${msg.image}" style="max-width: 180px; border-radius: 16px; display: block; object-fit: cover;" alt="attachment">`;
@@ -1114,10 +1100,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const globalBar = document.createElement("div");
     globalBar.id = "globalHomeBar";
     globalBar.innerHTML = '<div style="width: 134px; height: 5px; background: #ffffff; border-radius: 10px; pointer-events: none;"></div>';
-    
+
     // ตั้งสไตล์ให้ลอยอยู่ชั้นบนสุดตลอดเวลา ไม่ว่าเปิดแอปไหน
     globalBar.style.cssText = "position: absolute; bottom: 0; left: 0; width: 100%; height: 45px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px; cursor: pointer; z-index: 2147483647 !important; pointer-events: auto !important;";
-    
+
     // ผูกคำสั่งคลิกเพื่อปิดแอปกลับหน้า Home ทันที
     globalBar.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1130,15 +1116,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ดักจับการคลิกทุกจุดบนหน้าจอ ถ้ากดโดนขีดล่างหรือปุ่มย้อนกลับ สั่งปิดแอปทันทีแบบเด็ดขาด
-document.addEventListener("click", function(e) {
+document.addEventListener("click", function (e) {
   if (e.target.closest('.home-bar-container') || e.target.closest('#globalHomeBar') || e.target.classList.contains('nav-back-btn') || e.target.classList.contains('back-btn')) {
-    
+
     // 🚨 1. สั่งหยุดเสียงและวิดีโอทุกตัวบนหน้าจอทันที! (แก้บั๊กเสียงค้างตอนกด Home 100%)
     document.querySelectorAll('audio, video').forEach(media => {
       try {
         media.pause();
         media.currentTime = 0;
-      } catch(err) {}
+      } catch (err) { }
     });
 
     // หาว่าตอนนี้หน้าแอปไหนเปิดอยู่
@@ -1168,7 +1154,7 @@ function goHomeUniversal() {
     try {
       media.pause();
       media.currentTime = 0;
-    } catch(err) {}
+    } catch (err) { }
   });
 
   const allScreens = document.querySelectorAll('.app-screen, .screen, .folder-modal');
@@ -1306,215 +1292,61 @@ function openTikTokVideoPlayer(videoSrc, audioSrc, songTitle) {
 }
 
 
-// 1. กดปุ่มย้อนกลับจากหน้าจอเล่นวิดีโอเดี่ยว -> กลับไปหน้า Drafts (เพลงในหน้าเล่นวิดีโอหยุด แต่แอป TikTok ยังอยู่)
-function closeTikTokVideoPlayer() {
+// ==========================================
+// 📌 SECTION 1: ระบบดราฟต์ (TikTok Drafts)
+// ==========================================
+
+// 1. กด Back จากหน้าเล่นคลิปดราฟต์เดี่ยว -> ถอยกลับหน้า Drafts List
+function closeTikTokVideoPlayer(e) {
+  if (e) e.stopPropagation();
+
   const playerScreen = document.getElementById("tiktokVideoPlayerScreen");
   if (playerScreen) playerScreen.style.setProperty('display', 'none', 'important');
 
-  // หยุดเสียงและวิดีโอเฉพาะในหน้าเล่นเดี่ยว
-  const videoEl = document.getElementById("tiktokDraftVideo");
-  if (videoEl) {
-    videoEl.pause();
-    videoEl.currentTime = 0;
-  }
+  forceStopAllMedia();
 
-  const audioEl = document.getElementById("tiktokAudioPlayer");
-  if (audioEl) {
-    audioEl.pause();
-    audioEl.currentTime = 0;
-  }
-
-  // เปิดหน้า Drafts กลับมาเหมือนเดิม
   const draftsScreen = document.getElementById("tiktokDraftsScreen");
   if (draftsScreen) draftsScreen.style.setProperty('display', 'flex', 'important');
 }
 
-// 2. กดปุ่มย้อนกลับจากหน้า Drafts หรือกดออกแอป / กดปุ่ม Home -> ตัดจบเสียงเพลงทั้งหมดและปิดแอป TikTok ทันที
-function closeTikTok() {
-  const tiktokScreen = document.getElementById("tiktokScreen");
-  if (tiktokScreen) tiktokScreen.style.setProperty('display', 'none', 'important');
-  
+// 2. กด Back จากหน้า Drafts List -> ปิดหน้าดราฟต์กลับไป Profile
+function closeTikTokDrafts(e) {
+  if (e) e.stopPropagation();
+
   const draftsScreen = document.getElementById("tiktokDraftsScreen");
   if (draftsScreen) draftsScreen.style.setProperty('display', 'none', 'important');
 
-  const playerScreen = document.getElementById("tiktokVideoPlayerScreen");
-  if (playerScreen) playerScreen.style.setProperty('display', 'none', 'important');
-
-  // สั่งดับเสียงเพลงและวิดีโอทั้งหมดเคลียร์เกลี้ยง
-  stopAllTikTokMedia();
+  forceStopAllMedia();
 }
 
-// ฟังก์ชันปุ่ม Home (goHomeUniversal)
-function goHomeUniversal() {
-  const screens = document.querySelectorAll('.screen');
-  screens.forEach(screen => {
-    screen.style.setProperty('display', 'none', 'important');
-  });
-
-  // สั่งดับเสียงทั้งหมดตอนกลับหน้าโฮม
-  stopAllTikTokMedia();
-}
-
-// ฟังก์ชันกลางเคลียร์มีเดีย
-function stopAllTikTokMedia() {
-  const videoEl = document.getElementById("tiktokDraftVideo");
-  if (videoEl) {
-    videoEl.pause();
-    videoEl.currentTime = 0;
-  }
-
-  const audioEl = document.getElementById("tiktokAudioPlayer");
-  if (audioEl) {
-    audioEl.pause();
-    audioEl.currentTime = 0;
-  }
-}
-
-
-// ฟังก์ชันเปิด-ปิด หน้า Search ของ Instagram (ดึง z-index ขึ้นมาบนสุด)
-function openIgSearch() {
-  const searchScreen = document.getElementById("igSearchScreen");
-  if (searchScreen) {
-    searchScreen.style.setProperty('display', 'flex', 'important');
-    searchScreen.style.setProperty('z-index', '99999', 'important'); // บังคับให้ลอยเหนือทุกหน้า
-  }
-  
-  setTimeout(() => {
-    const input = document.getElementById("igSearchInput");
-    if (input) input.focus();
-  }, 100);
-}
-
-function closeIgSearch() {
-  const searchScreen = document.getElementById("igSearchScreen");
-  if (searchScreen) {
-    searchScreen.style.setProperty('display', 'none', 'important');
-  }
-}
-
-
-// ฟังก์ชันเปิดหน้าฟีด TikTok (รูปภาพ + วิดีโอเลื่อนต่อกัน)
-function openTiktokPostedVideo() {
-  const container = document.getElementById('tiktokFeedContainer');
-  const audio = document.getElementById('tiktokPhotoPostAudio');
-
-  if (container) {
-    container.style.display = 'block';
-    container.scrollTop = 0; // ตั้งให้เลื่อนมาที่คลิปแรกสุด (เสื้อขาว)
-  }
-
-  if (audio) {
-    audio.currentTime = 0;
-    audio.play().catch(err => console.log("Audio play error:", err));
-  }
-}
-
-// ฟังก์ชันปิดหน้าฟีด TikTok
-function closeTiktokPostedVideo() {
-  const container = document.getElementById('tiktokFeedContainer');
-  const audios = document.querySelectorAll('#tiktokFeedContainer audio');
-  const videos = document.querySelectorAll('#tiktokFeedContainer video');
-
-  if (container) {
-    container.style.display = 'none';
-  }
-
-  // ปิดเสียงและวิดีโอทั้งหมดในฟีด
-  audios.forEach(a => { a.pause(); a.currentTime = 0; });
-  videos.forEach(v => { v.pause(); v.currentTime = 0; });
-}
-
-
-// ฟังก์ชันเปิดหน้าดูวิดีโอ (รองรับเปลี่ยนวิดีโอ, เสียงเพลงแยก, และชื่อเพลง)
-function openTikTokVideoPlayer(videoPath, audioPath, songTitle) {
-  const playerScreen = document.getElementById('tiktokVideoPlayerScreen');
-  const videoElem = document.getElementById('tiktokDraftVideo');
-  const audioElem = document.getElementById('tiktokAudioPlayer');
-  const songTitleElem = document.getElementById('tiktokSongTitleText');
-
-  // 1. เปลี่ยนพาธวิดีโอและเริ่มเล่น
-  if (videoElem && videoPath) {
-    videoElem.src = videoPath;
-    videoElem.play();
-  }
-
-  // 2. เปลี่ยนพาธเสียงเพลงแยกและเริ่มเล่น
-  if (audioElem && audioPath) {
-    audioElem.src = audioPath;
-    audioElem.currentTime = 0;
-    audioElem.play().catch(err => console.log("Audio play error:", err));
-  }
-
-  // 3. เปลี่ยนข้อความชื่อเพลงบนแถบ Header
-  if (songTitleElem && songTitle) {
-    songTitleElem.innerText = '🎵 ' + songTitle;
-  }
-
-  // 4. แสดงผลหน้าจอ Video Player
-  if (playerScreen) {
-    playerScreen.style.display = 'flex';
-  }
-}
-
-// ฟังก์ชันปิดหน้าดูวิดีโอ (สั่งหยุดคลิปและตัดเสียงเพลง)
-function closeTikTokVideoPlayer() {
-  const playerScreen = document.getElementById('tiktokVideoPlayerScreen');
-  const videoElem = document.getElementById('tiktokDraftVideo');
-  const audioElem = document.getElementById('tiktokAudioPlayer');
-
-  if (playerScreen) {
-    playerScreen.style.display = 'none';
-  }
-  if (videoElem) {
-    videoElem.pause();
-  }
-  if (audioElem) {
-    audioElem.pause();
-    audioElem.currentTime = 0;
-  }
-}
-
-
-// ฟังก์ชันล้าง/หยุดเสียงวิดีโอและเพลงทั้งหมดในระบบ
-function stopAllTikTokAudio() {
-  const audios = document.querySelectorAll('audio');
-  const videos = document.querySelectorAll('video');
-  audios.forEach(a => { a.pause(); a.currentTime = 0; });
-  videos.forEach(v => { v.pause(); v.currentTime = 0; });
-}
-
-// 1. เปิด-ปิด หน้า Drafts
+// 3. เปิดหน้า Drafts List
 function openTikTokDrafts() {
-  stopAllTikTokAudio();
-
+  forceStopAllMedia();
   const draftScreen = document.getElementById('tiktokDraftsScreen');
-  if (draftScreen) draftScreen.style.display = 'flex';
+  if (draftScreen) draftScreen.style.setProperty('display', 'flex', 'important');
 }
 
-function closeTikTokDrafts() {
-  const draftScreen = document.getElementById('tiktokDraftsScreen');
-  if (draftScreen) draftScreen.style.display = 'none';
-}
-
+// 4. เปิดดูคลิปดราฟต์เดี่ยว
 function openTikTokVideoPlayer(videoPath, audioPath, songTitle) {
-  stopAllTikTokAudio();
+  forceStopAllMedia();
+
+  const draftsScreen = document.getElementById("tiktokDraftsScreen");
+  if (draftsScreen) draftsScreen.style.setProperty('display', 'none', 'important');
 
   const playerScreen = document.getElementById('tiktokVideoPlayerScreen');
   const videoElem = document.getElementById('tiktokDraftVideo');
   const audioElem = document.getElementById('tiktokAudioPlayer');
   const songTitleElem = document.getElementById('tiktokSongTitleText');
 
-  if (playerScreen) playerScreen.style.display = 'flex';
+  if (playerScreen) playerScreen.style.setProperty('display', 'flex', 'important');
 
-  // 1. สั่งเล่นวิดีโอแบบปิดเสียง (Muted 100%)
   if (videoElem && videoPath) {
     videoElem.src = videoPath;
-    videoElem.muted = true; // 👈 ล็อคปิดเสียงตัวคลิปวิดีโอตรงนี้!
+    videoElem.muted = true;
     videoElem.currentTime = 0;
     videoElem.play().catch(err => console.log(err));
   }
 
-  // 2. สั่งเล่นเฉพาะไฟล์เพลงแยก MP3
   if (audioElem && audioPath) {
     audioElem.src = audioPath;
     audioElem.currentTime = 0;
@@ -1526,87 +1358,106 @@ function openTikTokVideoPlayer(videoPath, audioPath, songTitle) {
   }
 }
 
-function closeTikTokVideoPlayer() {
-  stopAllTikTokAudio();
-  const playerScreen = document.getElementById('tiktokVideoPlayerScreen');
-  if (playerScreen) playerScreen.style.display = 'none';
-}
 
+// ==========================================
+// 📌 SECTION 2: ระบบฟีดคลิปหลัก (ช่อง 2 & ช่อง 3)
+// ==========================================
 
-// 📌 ฟังก์ชันหยุดเสียงและวิดีโอทั้งหมดในระบบทันที (ดักหยุดเสียงซ้อน 100%)
-function stopAllTikTokAudio() {
-  document.querySelectorAll('audio').forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-  document.querySelectorAll('video').forEach(v => {
-    v.pause();
-    v.currentTime = 0;
-  });
-}
-
-// ฟังก์ชันกดเปิดจากรูปเสื้อขาว (คลิปที่ 1 ในฟีด)
+// 1. กดเปิดฟีดคลิปจากรูปแรก (เสื้อขาว - คลิปที่ 1)
 function openTiktokPostedVideo() {
+  forceStopAllMedia();
   const container = document.getElementById('tiktokFeedContainer');
   
   if (container) {
-    container.style.display = 'block';
-    container.scrollTop = 0; 
+    container.style.setProperty('display', 'block', 'important');
+    container.scrollTop = 0; // ตั้งเริ่มที่คลิปแรกสุด
   }
 
-  // เล่นคลิป1 ( index 0 )
   playMediaAtItem(0);
 }
 
-function closeTiktokPostedVideo() {
-  stopAllTikTokAudio();
-  const screen = document.getElementById('tiktokPostedVideoScreen');
-  if (screen) screen.style.display = 'none';
-}
-
-// 2. เปิดปิดคลิปน้องออม
+// 2. กดเปิดฟีดคลิกจากรูปสอง (น้องออม - คลิปที่ 2)
 function openTikTokVideoPlayer3() {
-  stopAllTikTokAudio();
-  const screen = document.getElementById('tiktokVideoPlayerScreen3');
-  const video = document.getElementById('tiktokDraftVideo3');
-  const audio = document.getElementById('tiktokAudioPlayer3');
+  forceStopAllMedia();
+  const container = document.getElementById('tiktokFeedContainer');
+  
+  if (container) {
+    container.style.setProperty('display', 'block', 'important');
+    // เลื่อนลงไปตำแหน่งคลิปที่ 2
+    container.scrollTop = container.clientHeight;
+  }
 
-  if (screen) screen.style.display = 'flex';
-  if (video) {
-    video.muted = true;
-    video.currentTime = 0;
-    video.play().catch(e => console.log(e));
-  }
-  if (audio) {
-    audio.currentTime = 0;
-    audio.play().catch(e => console.log(e));
-  }
+  playMediaAtItem(1);
 }
 
-function closeTikTokVideoPlayer3() {
-  stopAllTikTokAudio();
-  const screen = document.getElementById('tiktokVideoPlayerScreen3');
-  if (screen) screen.style.display = 'none';
+// 3. กด Back ปิดหน้าฟีดคลิป
+function closeTiktokPostedVideo(e) {
+  if (e) e.stopPropagation();
+
+  const container = document.getElementById('tiktokFeedContainer');
+  if (container) container.style.setProperty('display', 'none', 'important');
+
+  forceStopAllMedia();
 }
 
-// ฟังก์ชันกดแถบขีดขาวล่างสุด (Global Home Bar) เด้งกลับหน้า Home -> เสียงดับสนิททันที!
-window.goHomeUniversal = function() {
-  stopAllTikTokAudio(); // สั่งตัดเสียงและวิดีโอทั้งหมดทันที
+// 4. ฟังก์ชันควบคุมเล่นมีเดียตามลำดับคลิป (0 = เสื้อขาว, 1 = น้องออม)
+function playMediaAtItem(index) {
+  const items = document.querySelectorAll('#tiktokFeedContainer .tiktok-feed-item');
+  
+  items.forEach((item, i) => {
+    const audios = item.querySelectorAll('audio');
+    const videos = item.querySelectorAll('video');
 
-  const allScreens = document.querySelectorAll('.app-screen, .screen');
-  allScreens.forEach(s => {
-    if (s.id !== 'homeScreen') {
-      s.style.display = 'none';
+    if (i === index) {
+      videos.forEach(v => { v.muted = true; v.currentTime = 0; v.play().catch(e => console.log(e)); });
+      audios.forEach(a => { a.currentTime = 0; a.play().catch(e => console.log(e)); });
+    } else {
+      videos.forEach(v => { v.pause(); v.currentTime = 0; });
+      audios.forEach(a => { a.pause(); a.currentTime = 0; });
     }
   });
+}
 
-  const home = document.getElementById('homeScreen');
-  if (home) home.style.display = 'flex';
-};
+// 5. ระบบตรวจจับการเลื่อนสกรอลล์หน้าฟีด (Scroll Listener)
+document.addEventListener('DOMContentLoaded', function() {
+  const feedContainer = document.getElementById('tiktokFeedContainer');
+  if (feedContainer) {
+    feedContainer.addEventListener('scroll', () => {
+      const containerHeight = feedContainer.clientHeight;
+      if (containerHeight === 0) return;
 
-// 📌 ระบบตัดเสียงฉุกเฉินระดับ Global (หยุดทุกอย่างเมื่อกลับหน้า Home)
+      const currentIndex = Math.round(feedContainer.scrollTop / containerHeight);
+      playMediaAtItem(currentIndex);
+    });
+  }
+});
+
+
+// ==========================================
+// 📌 SECTION 3: ฟังก์ชันปิดแอปหลัก & Home Bar
+// ==========================================
+
+// ปิด TikTok ทั้งหมด
+function closeTikTok(e) {
+  if (e) e.stopPropagation();
+
+  const tiktokScreen = document.getElementById("tiktokScreen");
+  if (tiktokScreen) tiktokScreen.style.setProperty('display', 'none', 'important');
+
+  const container = document.getElementById('tiktokFeedContainer');
+  if (container) container.style.setProperty('display', 'none', 'important');
+
+  const draftsScreen = document.getElementById("tiktokDraftsScreen");
+  if (draftsScreen) draftsScreen.style.setProperty('display', 'none', 'important');
+
+  const playerScreen = document.getElementById("tiktokVideoPlayerScreen");
+  if (playerScreen) playerScreen.style.setProperty('display', 'none', 'important');
+
+  forceStopAllMedia();
+}
+
+// ฟังก์ชันหยุดสื่อทั้งหมดฉุกเฉิน
 function forceStopAllMedia() {
-  // 1. สั่ง pause และ reset เวลาของ audio/video ทุกตัวบนหน้าเว็บ
   document.querySelectorAll('audio, video').forEach(media => {
     try {
       media.pause();
@@ -1617,148 +1468,92 @@ function forceStopAllMedia() {
   });
 }
 
-// 📌 ดักจับการกด Global Home Bar ขีดขาวล่างสุดโดยตรง
-document.addEventListener('DOMContentLoaded', function() {
-  const homeBar = document.getElementById('globalHomeBar');
-  if (homeBar) {
-    homeBar.addEventListener('click', function(e) {
-      // 1. หยุดเสียงทันที
-      forceStopAllMedia();
+// Global Home Bar
+window.goHomeUniversal = function() {
+  forceStopAllMedia();
 
-      // 2. ปิดหน้าจอแอปทั้งหมด
-      document.querySelectorAll('.screen, .app-screen').forEach(screen => {
-        if (screen.id !== 'homeScreen' && screen.id !== 'lockScreen' && screen.id !== 'passcodeScreen') {
-          screen.style.display = 'none';
+  const allScreens = document.querySelectorAll('.app-screen, .screen');
+  allScreens.forEach(s => {
+    if (s.id !== 'homeScreen') {
+      s.style.setProperty('display', 'none', 'important');
+    }
+  });
+
+  const home = document.getElementById('homeScreen');
+  if (home) home.style.setProperty('display', 'flex', 'important');
+};
+
+
+// ==========================================
+// 📌 ระบบ Search ของ Instagram (IG Search)
+// ==========================================
+
+// 1. เปิดหน้า Search IG
+function openIgSearch() {
+  const searchScreen = document.getElementById("igSearchScreen");
+  if (searchScreen) {
+    searchScreen.style.setProperty('display', 'flex', 'important');
+    searchScreen.style.setProperty('z-index', '99999', 'important'); // ดึงขึ้นมาบังหน้าสุด
+  }
+  
+  setTimeout(() => {
+    const input = document.getElementById("igSearchInput");
+    if (input) {
+      input.focus();
+    }
+  }, 100);
+}
+
+// 2. ปิดหน้า Search IG
+function closeIgSearch(e) {
+  if (e) e.stopPropagation();
+
+  const searchScreen = document.getElementById("igSearchScreen");
+  if (searchScreen) {
+    searchScreen.style.setProperty('display', 'none', 'important');
+    searchScreen.style.setProperty('z-index', '-1', 'important'); // ส่งลงไปข้างหลังสุด ไม่ให้บังปุ่มอื่น
+  }
+}
+
+// 3. ฟังก์ชันค้นหาในช่อง Input (ถ้ามี)
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById("igSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      const searchResults = document.querySelectorAll('.ig-search-item'); // หรือ class รายการค้นหาของมึง
+      
+      searchResults.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
         }
       });
-
-      // Home
-      const home = document.getElementById('homeScreen');
-      if (home) home.style.display = 'flex';
     });
   }
 });
 
+function goHomeFromChat(e) {
+  if (e) e.stopPropagation();
 
-// ฟังก์ชันปิดเดียว ใช้ได้กับทุกหน้า (ทั้งฟีดรวม ทั้งดราฟต์ ทั้งวิดีโอดราฟต์)
-function closeTikTokVideoPlayer() {
-  // 1. ซ่อนกล่องฟีดรวม (คลิปเสื้อขาว + คลิปออม)
-  const feedContainer = document.getElementById('tiktokFeedContainer');
-  if (feedContainer) feedContainer.style.display = 'none';
+  // 1. ปิดหน้าแชตเดี่ยว
+  const chatDetail = document.getElementById('chatDetailScreen');
+  if (chatDetail) chatDetail.style.setProperty('display', 'none', 'important');
 
-  // 2. ซ่อนหน้าหน้ารายการดราฟต์
-  const draftScreen = document.getElementById('tiktokDraftsScreen');
-  if (draftScreen) draftScreen.style.display = 'none';
+  // 2. ปิดหน้ารวมแชต iMessage
+  const messagesScreen = document.getElementById('messagesScreen');
+  if (messagesScreen) messagesScreen.style.setProperty('display', 'none', 'important');
 
-  // 3. ซ่อนหน้าเล่นวิดีโอดราฟต์เดี่ยว
-  const singlePlayerScreen = document.getElementById('tiktokVideoPlayerScreen');
-  if (singlePlayerScreen) singlePlayerScreen.style.display = 'none';
-
-  // 4. ตัดเสียงและวิดีโอทั้งหมดทันที
-  forceStopAllMedia();
-}
-
-// ผูกชื่อฟังก์ชันปิดอื่นๆ ให้วิ่งมาใช้ฟังก์ชันเดียวกันทั้งหมด
-window.closeTikTokDrafts = window.closeTiktokPostedVideo = window.closeTikTokVideoPlayer3 = closeTikTokVideoPlayer;
-
-// กดคลิปออมช่อง 3 (คลิปที่ 2)
-function openTikTokVideoPlayer3() {
-  const container = document.getElementById('tiktokFeedContainer');
-  
-  if (container) {
-    container.style.display = 'block';
-    container.scrollTop = container.clientHeight; // เลื่อนลงมาคลิปที่ 2
-  }
-
-  // เล่นเสียงและวิดีโอคลิปที่ 2 เคลียร์คลิปอื่น
-  playMediaAtItem(1);
-}
-
-// ฟังก์ชันจัดการเล่นมีเดียตาม Index ของคลิป (0 = เสื้อขาว, 1 = ออมช่อง 3)
-function playMediaAtItem(index) {
-  const items = document.querySelectorAll('#tiktokFeedContainer .tiktok-feed-item');
-  
-  items.forEach((item, i) => {
-    const audios = item.querySelectorAll('audio');
-    const videos = item.querySelectorAll('video');
-
-    if (i === index) {
-      // play media on active clip
-      audios.forEach(a => { a.currentTime = 0; a.play().catch(e => console.log(e)); });
-      videos.forEach(v => { v.currentTime = 0; v.play().catch(e => console.log(e)); });
-    } else {
-      // pause others
-      audios.forEach(a => { a.pause(); a.currentTime = 0; });
-      videos.forEach(v => { v.pause(); v.currentTime = 0; });
+  // 3. ปิดทุกแอปสกรีน
+  document.querySelectorAll('.screen, .app-screen').forEach(s => {
+    if (s.id !== 'homeScreen') {
+      s.style.setProperty('display', 'none', 'important');
     }
   });
-}
 
-// handle scroll feed ตรวจๆ
-const feedContainer = document.getElementById('tiktokFeedContainer');
-if (feedContainer) {
-  feedContainer.addEventListener('scroll', () => {
-    const items = feedContainer.querySelectorAll('.tiktok-feed-item');
-    const containerHeight = feedContainer.clientHeight;
-    
-    const currentIndex = Math.round(feedContainer.scrollTop / containerHeight);
-    
-    // play media when scrolled to view
-    items.forEach((item, index) => {
-      const audios = item.querySelectorAll('audio');
-      const videos = item.querySelectorAll('video');
-
-      if (index === currentIndex) {
-        audios.forEach(a => { if (a.paused) a.play().catch(e => console.log(e)); });
-        videos.forEach(v => { if (v.paused) v.play().catch(e => console.log(e)); });
-      } else {
-        audios.forEach(a => { a.pause(); a.currentTime = 0; });
-        videos.forEach(v => { v.pause(); v.currentTime = 0; });
-      }
-    });
-  });
-}
-
-
-
-// 1. กดไอคอน Phone จากหน้าหลัก ให้เปิดหน้า Favorites ก่อน
-function openPhoneContactsApp() {
-  if (typeof forceStopAllMedia === 'function') forceStopAllMedia();
-  
-  const screens = document.querySelectorAll('.app-screen');
-  screens.forEach(s => s.style.display = 'none');
-
-  const contactsScreen = document.getElementById('phoneContactsScreen');
-  if (contactsScreen) contactsScreen.style.display = 'flex';
-}
-
-// 2. กดชื่อ eomchan~ แล้วเด้งไปหน้ากดโทร + เล่นเสียง
-function openEomCallScreen() {
-  const contactsScreen = document.getElementById('phoneContactsScreen');
-  if (contactsScreen) contactsScreen.style.display = 'none';
-
-  const phoneScreen = document.getElementById('phoneScreen');
-  if (phoneScreen) {
-    phoneScreen.style.display = 'flex';
-    if (typeof startCall === 'function') startCall(); // เรียกสั่งโทร/เล่นเสียง
-  }
-}
-
-// 3. ปุ่ม Back ในหน้าโทร กดแล้วถอยกลับมาหน้า Favorites
-function backToContacts() {
-  if (typeof endCall === 'function') endCall();
-  if (typeof forceStopAllMedia === 'function') forceStopAllMedia();
-
-  const phoneScreen = document.getElementById('phoneScreen');
-  if (phoneScreen) phoneScreen.style.display = 'none';
-
-  const contactsScreen = document.getElementById('phoneContactsScreen');
-  if (contactsScreen) contactsScreen.style.display = 'flex';
-}
-
-// 4. ปิดหน้า Favorites กลับเข้าหน้า Home หลัก
-function closePhoneContactsApp() {
-  if (typeof forceStopAllMedia === 'function') forceStopAllMedia();
-  const contactsScreen = document.getElementById('phoneContactsScreen');
-  if (contactsScreen) contactsScreen.style.display = 'none';
+  // 4. เปิดหน้า Home หลัก
+  const home = document.getElementById('homeScreen');
+  if (home) home.style.setProperty('display', 'flex', 'important');
 }
